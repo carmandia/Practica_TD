@@ -1,0 +1,118 @@
+---
+title: "Problema 2.4"
+author: "Carlos Manzano Diaz"
+date: "2024-10-17"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = F)
+```
+
+## ejercicio 2.4 sol con el paquete ahp
+
+```{r}
+source("teoriadecision_funciones_multicriterio.R")
+library(ahp)
+datos=Load("datos24.ahp")
+Calculate(datos)
+Visualize(datos)
+```
+
+Recomendadas para hacer informes
+```{r}
+export_formattable(AnalyzeTable(datos),file = "table01.png")
+```
+
+
+```{r}
+export_formattable(AnalyzeTable(datos,variable = "priority"),file = "table02.png")
+```
+
+
+## Con funciones R
+```{r}
+source("teoriadecision_funciones_multicriterio_diagram.R")
+tablan01= multicriterio.crea.matrizvaloraciones_mej(c(2),numalternativas = 2)
+tablan02a=multicriterio.crea.matrizvaloraciones_mej(c(3),numalternativas = 2)
+tablan02b=multicriterio.crea.matrizvaloraciones_mej(c(1/2),numalternativas = 2)
+pesn01= multicriterio.metodoAHP.variante1.autovectormayorautovalor(tablan01)
+pesn02a=multicriterio.metodoAHP.variante1.autovectormayorautovalor(tablan02a)
+pesn02b=multicriterio.metodoAHP.variante1.autovectormayorautovalor(tablan02b)
+multicriterio.metodoAHP.pesosglobales_entabla(pesn01$valoraciones.ahp,
+          rbind(pesn02a$valoraciones.ahp,
+                pesn02b$valoraciones.ahp)  )
+# asi solo cuando es un arbol de 2 niveles
+
+
+Xmatriznivel2 = array(NA,dim=c(2,2,2))
+Xmatriznivel2[,,1] =tablan02a
+Xmatriznivel2[,,2] =tablan02b
+
+multicriterio.metodoahp.diagrama(tablan01,Xmatriznivel2)
+
+```
+
+
+Ejercicio 7 tambien
+```{r}
+source("teoriadecision_funciones_multicriterio.R")
+p7 = multicriterio.crea.matrizdecision(c(100,15,7,40,-50,
+                                         200,25,7,60,-200,
+                                         100,20,4,25,-25,
+                                         200,30,20,70,-350,
+                                         250,25,15,100,-500),
+                                       numalternativas = 5,
+                                       numcriterios = 5)
+(s7p1=multicriterio.metodoELECTRE_I(p7,pesos.criterios = c(0.25,0.25,0.2,0.2,0.2),
+                              nivel.concordancia.minimo.alpha = 0.7,
+                              no.se.compensan = c(60,Inf,4,Inf,Inf),
+                              que.alternativas = T))
+
+
+s7p1$relacion.dominante
+
+
+qgraph::qgraph(s7p1$relacion.dominante)
+s7p1$nucleo_aprox
+```
+
+
+```{r}
+(s7p2=multicriterio.metodoELECTRE_I(p7,pesos.criterios = c(0.25,0.25,0.2,0.2,0.2),
+                                    nivel.concordancia.minimo.alpha = 0.7,
+                                    no.se.compensan = c(60,Inf,4,Inf,Inf),
+                                    que.alternativas = c(4,5)))
+
+qgraph::qgraph(s7p2$relacion.dominante)
+s7p2$nucleo_aprox
+```
+
+
+```{r}
+(s7p3=multicriterio.metodoELECTRE_I(p7,pesos.criterios = c(0.25,0.25,0.2,0.2,0.2),
+                                    nivel.concordancia.minimo.alpha = 0.55,
+                                    no.se.compensan = c(60,Inf,4,Inf,Inf),
+                                    que.alternativas = c(4,5)))
+
+qgraph::qgraph(s7p3$relacion.dominante)
+s7p3$nucleo_aprox
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

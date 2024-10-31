@@ -1,0 +1,112 @@
+---
+title: "Ejercicio 2.7 Promethee"
+author: "Carlos Manzano Diaz"
+date: "2024-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+source("teoriadecision_funciones_multicriterio.R")
+source("teoriadecision_funciones_multicriterio_diagram.R")
+source("teoriadecision_funciones_multicriterio_utiles.R")
+```
+
+Cargamos la matriz con los valores
+```{r,echo=FALSE}
+(matdecision = multicriterio.crea.matrizdecision(
+vector_matporfilas = c(100, 15, 7, 40,-50,
+                       200, 25, 7, 60,-200,
+                       100, 20, 4, 25,-25,
+                       200, 30, 20, 70,-350,
+                       250, 25, 15, 100,-500),
+                        numalternativas = 5, 
+                        numcriterios = 5,
+                        v.nombresalt = paste0("A",1:5),
+                        v.nombrescri = paste0("C",1:5) 
+))
+```
+
+Asi tenemos la matriz de alternativas-criterios de este problema. Atencion al criterio 5 al que le cambiamos el signo porque tratamos de maximizar
+
+```{r,echo=FALSE}
+tab.fpref01 = matrix(c(
+                        # func, qi, pi, si
+                        1, 0,0,0,
+                        1, 0,0,0,
+                        1, 0,0,0,
+                        1,0,0,0,
+                        1,0,0,0), 
+                       nrow = 5,
+                       ncol = 4,
+                       byrow = T)
+pesos.criterios01 = c(1/5,1/5,1/5,1/5,1/5) # uno por cada criterio y tienen que sumar 1
+```
+
+Asi construimos la tabla con las funciones de preferencia y sus parametros junto con los pesos de cada criterio
+
+```{r,echo=FALSE}
+tab_Pmthe_i=multicriterio.metodo.promethee_i(tabdecs.X = matdecision,pesos.criterios = pesos.criterios01,tab.fpref =tab.fpref01)
+```
+
+Una vez cargado sacamos la matriz con los datos obtenidos y representamos con una grafo
+
+```{r}
+tab_Pmthe_i
+require("qgraph")
+qgraph(tab_Pmthe_i$tablarelacionsupera)
+
+```
+
+A continuacion usare el metodo Promethee 2 que nos da una ordenacion total
+
+
+```{r}
+tab_Pmthe_ii=multicriterio.metodo.promethee_ii(tabdecs.X = matdecision,pesos.criterios = pesos.criterios01,tab.fpref = tab.fpref01)
+```
+
+Y lo vuelvo a sacar como salida tanto la tabla como el grafo
+
+```{r}
+tab_Pmthe_ii
+qgraph(tab_Pmthe_ii$tablarelacionsupera)
+order(tab_Pmthe_ii$vflujos.netos,decreasing = T)
+```
+
+hago lo mismo con las funciones medias
+
+```{r,echo=FALSE}
+tab_Pmthe_i_med=multicriterio.metodo.promethee_i_med(tabdecs.X = matdecision,pesos.criterios = pesos.criterios01,tab.fpref = tab.fpref01)
+```
+
+```{r}
+tab_Pmthe_i_med
+qgraph(tab_Pmthe_i_med$tablarelacionsupera)
+```
+
+```{r}
+tab_Pmthe_ii_med=multicriterio.metodo.promethee_ii_med(tabdecs.X = matdecision,pesos.criterios = pesos.criterios01,tab.fpref = tab.fpref01)
+order(tab_Pmthe_ii_med$vflujos.netos,decreasing = T)
+```
+Y lo hago ahora con Promethee Windows
+
+```{r}
+tab_Pmthe_Windows=multicriterio.metodo.promethee_windows(matdecision = matdecision,tab.fpref = tab.fpref01,pesos.criterios = pesos.criterios01,fminmax = c("max","max","max","max","min"))
+tab_Pmthe_Windows$Acciones
+```
+En todos tenemos el mismo orden de las alternativas
+Lo sacamos con kable
+
+```{r,echo=FALSE,warning=FALSE}
+tab_Pmthe_Windows_2=multicriterio.metodo.promethee_windows_kableExtra(tab_Pmthe_Windows)
+tab_Pmthe_Windows_2$tabEscenario
+```
+
+```{r,echo=FALSE,warning=FALSE}
+tab_Pmthe_Windows_2$tabAcciones
+rownames(tab_Pmthe_Windows$Acciones)
+```
+
